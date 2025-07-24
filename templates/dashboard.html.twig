@@ -1,0 +1,223 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord - Bastien Webapp V2{% endblock %}
+
+{% block body %}
+<div class="dashboard">
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Tableau de bord</h1>
+            <p>Bienvenue, {{ user.nomUtilisateur }} !</p>
+        </div>
+        
+        <div class="dashboard-content">
+            <div class="themes-section">
+                <h2>Mes thèmes autorisés</h2>
+                <div id="themes-container" class="themes-grid">
+                    <div class="loading">Chargement des thèmes...</div>
+                </div>
+            </div>
+            
+            <div class="sport-section" id="sport-section" style="display: none;">
+                <h2>🏃‍♂️ Thème Sport</h2>
+                
+                <div class="sport-tabs">
+                    <button class="tab-btn active" data-tab="programmes">Programmes</button>
+                    <button class="tab-btn" data-tab="exercices">Exercices</button>
+                    <button class="tab-btn" data-tab="entrainements">Entraînements</button>
+                </div>
+                
+                <div id="programmes-tab" class="tab-content active">
+                    <div class="section-header">
+                        <h3>Mes programmes d'entraînement</h3>
+                        <button class="btn btn-primary" onclick="createNewProgramme()">Nouveau programme</button>
+                    </div>
+                    <div id="programmes-list" class="items-grid">
+                        <div class="loading">Chargement des programmes...</div>
+                    </div>
+                </div>
+                
+                <div id="exercices-tab" class="tab-content">
+                    <div class="section-header">
+                        <h3>Bibliothèque d'exercices</h3>
+                        <button class="btn btn-primary" onclick="createNewExercice()">Nouvel exercice</button>
+                    </div>
+                    <div id="exercices-list" class="items-grid">
+                        <div class="loading">Chargement des exercices...</div>
+                    </div>
+                </div>
+                
+                <div id="entrainements-tab" class="tab-content">
+                    <div class="section-header">
+                        <h3>Historique des entraînements</h3>
+                        <button class="btn btn-primary" onclick="createNewEntrainement()">Nouvel entraînement</button>
+                    </div>
+                    <div id="entrainements-list" class="items-grid">
+                        <div class="loading">Chargement des entraînements...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Tab switching functionality
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        // Remove active class from all tabs and buttons
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        
+        // Add active class to clicked button and corresponding tab
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab + '-tab').classList.add('active');
+    });
+});
+
+// Load user themes
+async function loadUserThemes() {
+    try {
+        const response = await fetch('/api/user/themes');
+        const data = await response.json();
+        
+        const container = document.getElementById('themes-container');
+        
+        if (data.success && data.themes.length > 0) {
+            container.innerHTML = data.themes.map(theme => `
+                <div class="theme-card" data-theme="${theme.nomTheme.toLowerCase()}">
+                    <h3>${theme.nomTheme}</h3>
+                    <p>${theme.descriptionTheme || 'Aucune description'}</p>
+                    <button class="btn btn-primary" onclick="accessTheme('${theme.nomTheme.toLowerCase()}')">
+                        Accéder
+                    </button>
+                </div>
+            `).join('');
+            
+            // If user has access to Sport theme, show the sport section
+            if (data.themes.some(theme => theme.nomTheme.toLowerCase() === 'sport')) {
+                document.getElementById('sport-section').style.display = 'block';
+                loadSportData();
+            }
+        } else {
+            container.innerHTML = '<p class="no-themes">Aucun thème autorisé pour votre compte.</p>';
+        }
+    } catch (error) {
+        console.error('Error loading themes:', error);
+        document.getElementById('themes-container').innerHTML = '<p class="error">Erreur lors du chargement des thèmes.</p>';
+    }
+}
+
+function accessTheme(themeName) {
+    if (themeName === 'sport') {
+        document.getElementById('sport-section').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+async function loadSportData() {
+    // Load programmes
+    loadProgrammes();
+    loadExercices();
+    loadEntrainements();
+}
+
+async function loadProgrammes() {
+    try {
+        const response = await fetch('/api/programmes');
+        const data = await response.json();
+        
+        const container = document.getElementById('programmes-list');
+        
+        if (data && data['hydra:member']) {
+            container.innerHTML = data['hydra:member'].map(programme => `
+                <div class="item-card">
+                    <h4>${programme.nomProgramme}</h4>
+                    <p>${programme.descriptionProgramme || 'Aucune description'}</p>
+                    <div class="item-actions">
+                        <button class="btn btn-secondary">Modifier</button>
+                        <button class="btn btn-danger">Supprimer</button>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = '<p>Aucun programme trouvé.</p>';
+        }
+    } catch (error) {
+        console.error('Error loading programmes:', error);
+        document.getElementById('programmes-list').innerHTML = '<p class="error">Erreur lors du chargement des programmes.</p>';
+    }
+}
+
+async function loadExercices() {
+    try {
+        const response = await fetch('/api/exercices');
+        const data = await response.json();
+        
+        const container = document.getElementById('exercices-list');
+        
+        if (data && data['hydra:member']) {
+            container.innerHTML = data['hydra:member'].map(exercice => `
+                <div class="item-card">
+                    <h4>${exercice.nomExercice}</h4>
+                    <p><strong>Type:</strong> ${exercice.typeExercice}</p>
+                    <p>${exercice.descriptionExercice || 'Aucune description'}</p>
+                    <div class="item-actions">
+                        <button class="btn btn-secondary">Modifier</button>
+                        <button class="btn btn-danger">Supprimer</button>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = '<p>Aucun exercice trouvé.</p>';
+        }
+    } catch (error) {
+        console.error('Error loading exercices:', error);
+        document.getElementById('exercices-list').innerHTML = '<p class="error">Erreur lors du chargement des exercices.</p>';
+    }
+}
+
+async function loadEntrainements() {
+    try {
+        const response = await fetch('/api/entrainements');
+        const data = await response.json();
+        
+        const container = document.getElementById('entrainements-list');
+        
+        if (data && data['hydra:member']) {
+            container.innerHTML = data['hydra:member'].map(entrainement => `
+                <div class="item-card">
+                    <h4>Entraînement du ${new Date(entrainement.dateEntrainement).toLocaleDateString('fr-FR')}</h4>
+                    <p><strong>Durée:</strong> ${entrainement.dureeMinutes || 'Non renseignée'} minutes</p>
+                    <p>${entrainement.notesEntrainement || 'Aucune note'}</p>
+                    <div class="item-actions">
+                        <button class="btn btn-secondary">Modifier</button>
+                        <button class="btn btn-danger">Supprimer</button>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = '<p>Aucun entraînement trouvé.</p>';
+        }
+    } catch (error) {
+        console.error('Error loading entrainements:', error);
+        document.getElementById('entrainements-list').innerHTML = '<p class="error">Erreur lors du chargement des entraînements.</p>';
+    }
+}
+
+// Initialize dashboard
+loadUserThemes();
+
+// Placeholder functions for creating new items
+function createNewProgramme() {
+    alert('Fonctionnalité de création de programme à implémenter');
+}
+
+function createNewExercice() {
+    alert('Fonctionnalité de création d\'exercice à implémenter');
+}
+
+function createNewEntrainement() {
+    alert('Fonctionnalité de création d\'entraînement à implémenter');
+}
+</script>
+{% endblock %}

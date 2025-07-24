@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription - Bastien Webapp V2{% endblock %}
+
+{% block body %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Créer un compte</h2>
+        
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="nomUtilisateur">Nom d'utilisateur</label>
+                <input type="text" id="nomUtilisateur" name="nomUtilisateur" required class="form-control" minlength="3">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required class="form-control">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" required class="form-control" minlength="6">
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">Confirmer le mot de passe</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required class="form-control" minlength="6">
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-full">Créer le compte</button>
+        </form>
+        
+        <div class="auth-links">
+            <p>Déjà un compte ? <a href="{{ path('app_login') }}">Se connecter</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const password = formData.get('password');
+    const confirmPassword = formData.get('confirmPassword');
+    
+    if (password !== confirmPassword) {
+        alert('Les mots de passe ne correspondent pas');
+        return;
+    }
+    
+    const data = {
+        nomUtilisateur: formData.get('nomUtilisateur'),
+        email: formData.get('email'),
+        password: password
+    };
+    
+    fetch('/api/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Compte créé avec succès ! Vous pouvez maintenant vous connecter.');
+            window.location.href = '{{ path('app_login') }}';
+        } else {
+            alert('Erreur lors de la création du compte: ' + data.message);
+            if (data.errors) {
+                console.error('Validation errors:', data.errors);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur est survenue lors de la création du compte');
+    });
+});
+</script>
+{% endblock %}

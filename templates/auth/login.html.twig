@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion - Bastien Webapp V2{% endblock %}
+
+{% block body %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Connexion</h2>
+        
+        <form id="loginForm" method="post" action="{{ path('app_login') }}">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="_username" required class="form-control">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="_password" required class="form-control">
+            </div>
+            
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            
+            <button type="submit" class="btn btn-primary btn-full">Se connecter</button>
+        </form>
+        
+        <div class="auth-links">
+            <p>Pas encore de compte ? <a href="{{ path('app_register') }}">Créer un compte</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = {
+        email: formData.get('_username'),
+        password: formData.get('_password')
+    };
+    
+    // For API-based authentication
+    fetch('/api/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '{{ path('app_dashboard') }}';
+        } else {
+            alert('Erreur de connexion: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Fallback to traditional form submission
+        this.submit();
+    });
+});
+</script>
+{% endblock %}

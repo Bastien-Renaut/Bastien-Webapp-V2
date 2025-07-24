@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ title ?? 'Bastien Webapp V2' }}{% endblock %}</title>
+    
+    <!-- PWA Meta tags -->
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Bastien Webapp V2">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    
+    <!-- Styles -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="{{ path('app_home') }}" class="nav-brand">
+                    <h1>Bastien Webapp V2</h1>
+                </a>
+                
+                <div class="nav-menu">
+                    {% if app.user %}
+                        <a href="{{ path('app_dashboard') }}" class="nav-link">Tableau de bord</a>
+                        <a href="{{ path('app_logout') }}" class="nav-link">Déconnexion</a>
+                        <span class="nav-user">{{ app.user.nomUtilisateur }}</span>
+                    {% else %}
+                        <a href="{{ path('app_login') }}" class="nav-link">Connexion</a>
+                        <a href="{{ path('app_register') }}" class="nav-link">Inscription</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            {% block body %}{% endblock %}
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2024 Bastien Webapp V2. Tous droits réservés.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ asset('js/app.js') }}"></script>
+    {% block javascripts %}{% endblock %}
+</body>
+</html>
