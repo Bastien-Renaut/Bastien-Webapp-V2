@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - Bastien Webapp V2{% endblock %}
+
+{% block body %}
+<div class="hero">
+    <div class="hero-content">
+        <h1>Bienvenue sur Bastien Webapp V2</h1>
+        <p class="hero-subtitle">Une Progressive Web App pour la gestion de contenu thématique</p>
+        
+        {% if not app.user %}
+            <div class="hero-actions">
+                <a href="{{ path('app_register') }}" class="btn btn-primary">Commencer</a>
+                <a href="{{ path('app_login') }}" class="btn btn-secondary">Se connecter</a>
+            </div>
+        {% else %}
+            <div class="hero-actions">
+                <a href="{{ path('app_dashboard') }}" class="btn btn-primary">Accéder au tableau de bord</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="features">
+    <div class="container">
+        <h2>Fonctionnalités principales</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>🏃‍♂️ Thème Sport</h3>
+                <p>Gérez vos programmes d'entraînement, séances et exercices de manière organisée.</p>
+            </div>
+            <div class="feature-card">
+                <h3>🔐 Authentification sécurisée</h3>
+                <p>Système de connexion robuste avec gestion des sessions utilisateur.</p>
+            </div>
+            <div class="feature-card">
+                <h3>📱 Progressive Web App</h3>
+                <p>Utilisez l'application comme une app native sur votre appareil mobile.</p>
+            </div>
+            <div class="feature-card">
+                <h3>🚀 API RESTful</h3>
+                <p>API complète avec Symfony API Platform pour une intégration facile.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

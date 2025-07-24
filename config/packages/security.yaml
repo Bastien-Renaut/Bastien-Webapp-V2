@@ -21,14 +21,10 @@ security:
         api:
             pattern: ^/api/
             stateless: true
-            entry_point: app.authentication_entry_point
             json_login:
                 check_path: /api/login
                 username_path: email
                 password_path: password
-                success_handler: app.authentication_success_handler
-                failure_handler: app.authentication_failure_handler
-            jwt: ~
             
         main:
             lazy: true

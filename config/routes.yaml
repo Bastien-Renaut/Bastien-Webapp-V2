@@ -1,5 +1,6 @@
-imports:
-    - { resource: routes/api_platform.yaml }
+controllers:
+    resource: ../src/Controller/
+    type: attribute
 
 api_platform:
     resource: .
