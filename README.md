@@ -1,6 +1,4 @@
 # Bastien-Webapp-V2
-
-Projet PWA de Gestion de Thèmes Personnalisés
 =============================================
 
 Description du Projet
