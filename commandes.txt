@@ -1,0 +1,43 @@
+# Commandes pour configurer l'environnement du projet Bastien-Webapp-V2
+
+## 1. Installation de PHP 8.3 et Composer (si nécessaire)
+# sudo apt update
+# sudo apt install php8.3 php8.3-cli php8.3-mysql php8.3-xml php8.3-curl php8.3-mbstring php8.3-intl php8.3-zip
+# composer --version
+
+## 2. Installation de MySQL (si nécessaire)
+# sudo apt install mysql-server
+# sudo mysql_secure_installation
+
+## 3. Configuration de la base de données MySQL
+# sudo mysql -u root -p
+# CREATE DATABASE bastien_webapp_v2;
+# CREATE USER 'webapp_user'@'localhost' IDENTIFIED BY 'webapp_password';
+# GRANT ALL PRIVILEGES ON bastien_webapp_v2.* TO 'webapp_user'@'localhost';
+# FLUSH PRIVILEGES;
+# EXIT;
+
+## 4. Installation de Symfony CLI (optionnel mais recommandé)
+# curl -sS https://get.symfony.com/cli/installer | bash
+# export PATH="$HOME/.symfony5/bin:$PATH"
+
+## 5. Vérification des prérequis Symfony
+# symfony check:requirements
+
+## 6. Après création du projet, installation des dépendances
+# composer install
+
+## 7. Configuration de la base de données dans .env.local
+# Créer le fichier .env.local avec:
+# DATABASE_URL="mysql://webapp_user:webapp_password@127.0.0.1:3306/bastien_webapp_v2"
+
+## 8. Création et exécution des migrations
+# php bin/console doctrine:migrations:migrate
+
+## 9. Démarrage du serveur de développement
+# symfony server:start
+# ou
+# php -S localhost:8000 -t public/
+
+## 10. Pour tester l'API Platform
+# Ouvrir http://localhost:8000/api dans le navigateur

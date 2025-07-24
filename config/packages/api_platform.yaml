@@ -1,0 +1,34 @@
+api_platform:
+    title: 'Bastien Webapp V2 API'
+    version: '1.0.0'
+    description: 'API pour la gestion des thèmes et du contenu structuré'
+    
+    # Global configuration
+    mapping:
+        paths: ['%kernel.project_dir%/src/Entity']
+    
+    # API documentation
+    swagger:
+        api_keys:
+            apiKey:
+                name: Authorization
+                type: header
+    
+    # Format configuration
+    formats:
+        jsonld: ['application/ld+json']
+        json: ['application/json']
+        html: ['text/html']
+    
+    # Exception handling
+    exception_to_status:
+        Symfony\Component\Serializer\Exception\ExceptionInterface: 400
+        ApiPlatform\Exception\InvalidArgumentException: 400
+        ApiPlatform\Exception\FilterValidationException: 400
+        Doctrine\ORM\OptimisticLockException: 409
+    
+    # Enable filtering, searching, ordering
+    defaults:
+        pagination_enabled: true
+        pagination_page_size: 10
+        pagination_maximum_items_per_page: 30
